@@ -52,10 +52,6 @@ def create_student():
 @app.route("/api/v1/students/<int:student_id>",methods=["PUT"])
 def update_student(student_id):
     data = request.get_json()
-    student = next((st for st in students if st["id"] == student_id), None)
-
-    if not student:
-        return jsonify({"error": "Student not found."}), 404
     
     student = Student.query.get_or_404(student_id)
 
