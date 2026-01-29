@@ -5,7 +5,11 @@ services:
       dockerfile: ./Dockerfile
     container_name: backend
     ports:
-      - 8080:8080
+      - 5000:5000
+    volumes:
+      - .:/usr/src/app
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PWD}@postgres_db/${POSTGRES_DB}
     depends_on:
       - db-service
 
@@ -20,11 +24,16 @@ services:
       POSTRES_DB: ${POSTGRES_DB}
     ports:
       - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql 
 
   adminer:
     image: adminer
     restart: unless-stopped
     ports:
-      - 5000:5000
+      - 8080:8080
     depends_on:
       - db-service
+
+volumes:
+  postgres_data:

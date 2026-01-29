@@ -5,3 +5,10 @@
 3. Setup one-click local setup
 4. Setup a CI/Cd pipeline
 
+## Running the app
+- dont forget to create the database manually
+```bash
+> docker exec -it postgres_db psql -U postgres
+> CREATE DATABASE students;
+> \q
+```

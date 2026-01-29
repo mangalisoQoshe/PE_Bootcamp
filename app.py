@@ -1,14 +1,14 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
-import os
+import os, logging
 from extensions import db
 from models import Student
 
-
 app = Flask(__name__)
 
-
 DATABASE_URL = os.environ.get("DATABASE_URL")
+
+app.logger.info(DATABASE_URL)
 
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is not set")
@@ -19,6 +19,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
+with app.app_context():
+    db.create_all()
 
 @app.route("/")
 def home():
@@ -29,7 +31,6 @@ def home():
 def get_students():
     students = Student.query.all()
     return jsonify([s.to_dict() for s in students])
-
 
 @app.route("/api/v1/students/<int:student_id>",methods=["GET"])
 def get_student(student_id):

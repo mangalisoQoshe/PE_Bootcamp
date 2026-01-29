@@ -1,4 +1,4 @@
-FROM python:3.15.0a5-trixie
+FROM python:3.14-alpine
 
 WORKDIR /usr/src/app
 
@@ -9,10 +9,9 @@ COPY app.py extensions.py models.py /usr/src/app
 
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
-ENV DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PWD}@db:5432/${POSTGRES_DB}
 
-EXPOSE 8080
+EXPOSE 5000
 
-CMD ["flask","run","--port","8080"]
+CMD ["flask","run","--port","5000","--debug"]
 
 
