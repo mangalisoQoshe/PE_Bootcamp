@@ -1,21 +1,26 @@
 from flask import Flask, jsonify, request
+from flask_sqlalchemy import SQLAlchemy
+import os, logging
+from extensions import db
+from models import Student
 
 app = Flask(__name__)
 
-students = [
-    {"id": 1, "name": "Alice", "age": 18},
-    {"id": 2, "name": "Bob", "age": 19},
-    {"id": 3, "name": "Charlie", "age": 20},
-    {"id": 4, "name": "Diana", "age": 18},
-    {"id": 5, "name": "Ethan", "age": 21},
-    {"id": 6, "name": "Fiona", "age": 19},
-    {"id": 7, "name": "George", "age": 22},
-    {"id": 8, "name": "Hannah", "age": 20},
-    {"id": 9, "name": "Ian", "age": 18},
-    {"id": 10, "name": "Julia", "age": 21},
-]
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
+app.logger.info(DATABASE_URL)
 
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not set")
+
+# PostgreSQL connection
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL    
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 @app.route("/")
 def home():
@@ -24,16 +29,13 @@ def home():
 
 @app.route("/api/v1/students",methods=['GET'])
 def get_students():
-    return jsonify(students)
-
+    students = Student.query.all()
+    return jsonify([s.to_dict() for s in students])
 
 @app.route("/api/v1/students/<int:student_id>",methods=["GET"])
 def get_student(student_id):
-    for student in students:
-        if student["id"] == student_id:
-            return jsonify(student)
-
-    return jsonify({"error": "Student not found"}), 404
+    student = Student.query.get_or_404(student_id)
+    return jsonify(student.to_dict())
 
 @app.route("/api/v1/students",methods=["POST"])      
 def create_student():
@@ -41,39 +43,35 @@ def create_student():
     if not data or "name" not in data or "age" not in data:
         return jsonify({"error": "Name and Age are required"}), 400
     
-    new_student = {
-        "id": max(st["id"] for st in students) + 1 if students else 1,
-        "name": data["name"],
-        "age": data["age"]
-    }
+    student = Student(name=data["name"], age=data["age"])
+    db.session.add(student)
+    db.session.commit()
 
-    students.append(new_student)
-    return jsonify(new_student), 201
+    return jsonify(student.to_dict()), 201
 
 
 @app.route("/api/v1/students/<int:student_id>",methods=["PUT"])
 def update_student(student_id):
     data = request.get_json()
-    student = next((st for st in students if st["id"] == student_id), None)
+    
+    student = Student.query.get_or_404(student_id)
 
-    if not student:
-        return jsonify({"error": "Student not found."}), 404
-    
-    student["name"] = data.get("name", student["name"])
-    student["age"] = data.get("age", student["age"])
-    
-    return jsonify(student)
+    if "name" in data:
+        student.name = data["name"]
+
+    if "age" in data:
+        student.age = data["age"]
+
+    db.session.commit()
+
+    return jsonify(student.to_dict())
 
 @app.route("/api/v1/students/<int:student_id>",methods=["DELETE"])
 def delete_student(student_id):
-    global students
-    student = next((st for st in students if st["id"] == student_id), None)
-
-    if not student:
-        return jsonify({"error": "Student not found."}), 404
-
-    students = [st for st in students if st["id"] != student_id]
-    return jsonify({"message": "User deleted"})
+    student = Student.query.get_or_404(student_id)
+    db.session.delete(student)
+    db.session.commit()
+    return "", 204      
 
  
 @app.route("/api/v1/health", methods=["GET"])
