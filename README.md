@@ -6,7 +6,6 @@
 4. Setup a CI/Cd pipeline
 
 ## Running the app
-- dont forget to create the database manually
 ```bash
     ./build.sh # build the backend Docker Image
     ./build.sh up -d # run the containers
