@@ -8,7 +8,7 @@
 ## Running the app
 - dont forget to create the database manually
 ```bash
-> docker exec -it postgres_db psql -U postgres
-> CREATE DATABASE students;
-> \q
+    ./build.sh # build the backend Docker Image
+    ./build.sh up -d # run the containers
+    ./build.sh down # stop and remove the containers
 ```
