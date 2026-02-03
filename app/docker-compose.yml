@@ -1,17 +1,16 @@
 services:
   backend-service:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    image: pe_bootcamp/backend:1.0.0
     container_name: backend
     ports:
       - 5000:5000
-    volumes:
-      - .:/usr/src/app
+    # volumes:
+    #   - .:/usr/src/app  # For development
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PWD}@postgres_db/${POSTGRES_DB}
     depends_on:
-      - db-service
+      db-service:
+        condition: service_healthy
 
   db-service:
     image: postgres:18
@@ -25,7 +24,13 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - postgres_data:/var/lib/postgresql 
+      - postgres_data:/var/lib/postgresql/18/docker
+      - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   adminer:
     image: adminer
