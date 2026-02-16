@@ -5,7 +5,7 @@
 3. Setup one-click local setup
 4. Setup a CI/Cd pipeline
 
-## Running the app
+##How to run the app
 ```bash
     ./build.sh # build the backend Docker Image
     ./build.sh up -d # run the containers
