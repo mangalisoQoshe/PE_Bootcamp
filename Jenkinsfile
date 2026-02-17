@@ -7,7 +7,7 @@ pipeline {
     options {
         timestamps()                  // Add timestamps to logs
         timeout(time: 30, unit: 'MINUTES')  // Abort if pipeline takes too long
-        // buildDiscarder(logRotator(numToKeepStr: '10'))  // Keep only last 10 builds
+       
     }
 
     stages {
@@ -35,7 +35,7 @@ pipeline {
                 DOCKERHUB_CREDS = credentials("Dockerhub creds")
             }
             steps {
-                sh "echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin"
+                sh "echo ${DOCKERHUB_CREDS_PSW} | docker login -u ${DOCKERHUB_CREDS_USR} --password-stdin"
                 sh "./build.sh push"
                 sh "echo '✅ Image pushed to Docker Hub'"
             }
@@ -48,9 +48,11 @@ pipeline {
             sh "docker logout || true"
             // Clean up dangling images
             sh "docker image prune -f || true"
+            //cleanWs()
         }
         success {
             echo "Pipeline succeeded!"
+            
         }
         failure {
             echo "Pipeline failed!"
