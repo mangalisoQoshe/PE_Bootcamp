@@ -2,22 +2,58 @@ pipeline {
     agent {
         label "agentX"
     }
+
+
+    options {
+        timestamps()                  // Add timestamps to logs
+        timeout(time: 30, unit: 'MINUTES')  // Abort if pipeline takes too long
+        // buildDiscarder(logRotator(numToKeepStr: '10'))  // Keep only last 10 builds
+    }
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                sh "pwd"
-                sh "ls"
+                checkout scm
+                sh "chmod 755 ./build.sh ./test.sh"
             }
         }
+
+        stage('Build & Tag') {
+            steps {
+                sh "./build.sh"
+            }
+        }
+
         stage('Test') {
             steps {
-                echo "testing"
+                sh "./test.sh"
             }
         }
-        stage('Deploy') {
-            steps {
-                echo "deploy"
+
+        stage('Push to DockerHub') {
+            environment {
+                DOCKERHUB_CREDS = credentials("Dockerhub creds")
             }
+            steps {
+                sh "echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin"
+                sh "./build.sh push"
+                sh "echo '✅ Image pushed to Docker Hub'"
+            }
+        }
+    }
+
+    post {
+        always {
+            // Always logout from Docker regardless of pipeline result
+            sh "docker logout || true"
+            // Clean up dangling images
+            sh "docker image prune -f || true"
+        }
+        success {
+            echo "✅ Pipeline succeeded!"
+        }
+        failure {
+            echo "❌ Pipeline failed!"
         }
     }
 }
