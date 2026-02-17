@@ -6,12 +6,22 @@ set -e
 COMPOSE_FILE="./app/docker-compose.yml"
 DOCKERFILE="./app/Dockerfile"
 IMAGE_NAME="pe_bootcamp/backend:1.0.0"
-
+BLUE='\033[34m'
+RED='\033[31m'
+RESET='\033[0m'
 # --- Functions ---
 
-# Standard error logger
+# Standard logger
+info() {
+    echo -e "\n${BLUE}[$(date +'%H:%M:%S')]  INFO: $*${RESET}"
+}
+
+warn() {
+    echo -e "\n${RED}[$(date +'%H:%M:%S')]  WARN: $*${RESET}" >&2
+}
+
 err() {
-    echo -e "\n[$(date +'%Y-%m-%dT%H:%M:%S%z')] ERROR: $*" >&2
+    echo -e "\n${RED}[$(date +'%H:%M:%S')]  ERROR: $*${RESET}" >&2
     exit 1
 }
 
@@ -19,6 +29,15 @@ err() {
 check_files() {
     [[ -f "$DOCKERFILE" ]] || err "Dockerfile not found at $DOCKERFILE"
     [[ -f "$COMPOSE_FILE" ]] || err "Docker Compose file not found at $COMPOSE_FILE"
+}
+
+# Check if required binaries are insalled
+check_binaries() {
+    if command -v docker &> /dev/null; then 
+        info "Docker is installed."
+    else 
+        err "Docker is not installed. You may use the convienence script to install it. https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script"
+    fi
 }
 
 check_env() {
@@ -45,6 +64,7 @@ build() {
 # --- Execution ---
 
 # 1. Initial Checks
+check_binaries
 check_files
 check_env
 
@@ -72,7 +92,7 @@ case "$1" in
 
     *)
         # Catch-all for typos
-        echo "Usage: $0 {up|up -d|down}"
+        echo "Usage: $0 {up|up -d |down}"
         err "Unexpected expression: '$1'"
         ;;
 esac

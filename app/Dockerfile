@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 COPY requirements.txt /usr/src/app
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py extensions.py models.py /usr/src/app
+COPY app.py extensions.py models.py /usr/src/app/
 
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
