@@ -73,7 +73,7 @@ push_dockerhub() {
 # 1. Initial Checks
 check_binaries
 check_files
-check_env
+
 
 # 2. Argument Handling
 # We use a case statement here because it's cleaner than nested IFs
@@ -82,6 +82,7 @@ case "$1" in
         build
         echo "🚀 Starting the containers..."
         # We use "${@:1}" to pass all arguments (like -d) to docker compose
+        check_env
         docker compose -f "$COMPOSE_FILE" up "${@:2}"
         ;;
 
