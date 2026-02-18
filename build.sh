@@ -5,7 +5,9 @@ set -e
 # --- Configuration ---
 COMPOSE_FILE="./app/docker-compose.yml"
 DOCKERFILE="./app/Dockerfile"
-IMAGE_NAME="pe_bootcamp/backend:1.0.0"
+IMAGE_NAME="students_api"
+VERSION="1.0.0"
+REPOSITORY_NAME="mangaliso98"
 BLUE='\033[34m'
 RED='\033[31m'
 RESET='\033[0m'
@@ -57,8 +59,13 @@ check_env() {
 }
 
 build() {
-    echo "🔨 Building Docker image: $IMAGE_NAME..."
-    docker build -f "$DOCKERFILE" -t "$IMAGE_NAME" ./app || err "Docker build failed!"
+    echo "🔨 Building Docker image: "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION"..."
+    docker build -f "$DOCKERFILE" -t "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION" ./app || err "Docker build failed!"
+}
+
+push_dockerhub() {
+    echo "🔨 Preparing to push "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION" to Dockerhub registry."
+    docker push "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION"
 }
 
 # --- Execution ---
@@ -66,7 +73,7 @@ build() {
 # 1. Initial Checks
 check_binaries
 check_files
-check_env
+
 
 # 2. Argument Handling
 # We use a case statement here because it's cleaner than nested IFs
@@ -75,6 +82,7 @@ case "$1" in
         build
         echo "🚀 Starting the containers..."
         # We use "${@:1}" to pass all arguments (like -d) to docker compose
+        check_env
         docker compose -f "$COMPOSE_FILE" up "${@:2}"
         ;;
 
@@ -82,6 +90,9 @@ case "$1" in
         echo "🗑️ Destroying the containers..."
         # Using -v ensures volumes are cleaned up to avoid "ghost data"
         docker compose -f "$COMPOSE_FILE" down -v
+        ;;
+    "push")
+        push_dockerhub
         ;;
 
     "")
