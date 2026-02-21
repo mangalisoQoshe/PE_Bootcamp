@@ -45,9 +45,9 @@ pipeline {
     post {
         always {
             // Always logout from Docker regardless of pipeline result
-            sh "docker logout || true"
+            sh "docker logout"
             // Clean up dangling images
-            sh "docker image prune -f || true"
+            sh "docker image prune -f"
             //cleanWs()
         }
         success {

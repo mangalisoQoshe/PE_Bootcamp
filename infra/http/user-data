@@ -1,0 +1,26 @@
+#cloud-config
+autoinstall:
+  version: 1
+  locale: en_ZA.UTF-8
+  timezone: Africa/Johannesburg
+  keyboard:
+    layout: us
+  
+  identity:      
+    hostname: eye-of-earth
+    username: admin
+    password: "$6$dw0E0OV94zNVkLrh$2.cosuB6dkbWSitROt0PT2oWFl/jWma87wepXxE2i7U1/C85Hp4QHa/3eQm5A5437vIMr5udTBU1yG4iL6vPY."
+  
+  ssh:
+    install-server: true
+    allow-pw: true
+    authorized-keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWNdoXOoMitASBzbG24xlP0AdqZQDv8AJJH/QDuWOnV admin@eye-of-earth
+  
+  packages:
+    - qemu-guest-agent
+  
+  late-commands:
+    - echo 'admin ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/admin
+    - chmod 440 /target/etc/sudoers.d/admin
+
