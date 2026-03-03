@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # C extensions
+*.qcow2
 *.so
 
 # Distribution / packaging
@@ -205,3 +206,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Terraform & Packer
+.terraform/*
+terraform.tfstate*
+infra/packer/output_ubuntu_24.04.4-server/*
+
