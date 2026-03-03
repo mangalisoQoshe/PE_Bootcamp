@@ -45,27 +45,27 @@ resource "libvirt_volume" "vm_disk" {
 
 
 # Network
-resource "libvirt_network" "virt_network" {
-  name      = "virt-network"
-  autostart = true
-  forward = {
-    mode = "nat"
-  }
-  ips = [
-    {
-      address = "10.0.0.1"
-      prefix  = "24"
-      dhcp = {
-        ranges = [
-          {
-            start = "10.0.0.20"
-            end   = "10.0.0.30"
-          }
-        ]
-      }
-    }
-  ]
-}
+# resource "libvirt_network" "virt_network" {
+#   name      = "virt-network"
+#   autostart = true
+#   forward = {
+#     mode = "nat"
+#   }
+#   ips = [
+#     {
+#       address = "10.0.0.1"
+#       prefix  = "24"
+#       dhcp = {
+#         ranges = [
+#           {
+#             start = "10.0.0.20"
+#             end   = "10.0.0.30"
+#           }
+#         ]
+#       }
+#     }
+#   ]
+# }
 
 # VM Domain 
 resource "libvirt_domain" "vm" {
@@ -74,8 +74,9 @@ resource "libvirt_domain" "vm" {
   memory_unit = "MiB"
   vcpu        = 1
   type        = "kvm"
+  running     = true
 
-
+# UEFI and Secure Boot configuratio
 os = {
   type            = "hvm"
   type_arch       = "x86_64"
@@ -121,7 +122,7 @@ os = {
 
         source = {
           network = {
-            network = libvirt_network.virt_network.name
+            network = "default"
           }
         }
         wait_for_ip = {
@@ -142,13 +143,27 @@ os = {
       { type = "pty", target = { type = "serial", port = 0 } }
     ]
 
+    channels = [ {
+      source = {
+        unix = {
+          mode = "bind"
+        }
+      }
+      target = {
+        type = "virtio"
+        virt_io = {
+          name = "org.qemu.guest_agent.0"
+        }
+      }
+    } ]
+
 
   }
    cpu = {
     mode = "host-passthrough"
   }
 
-  running = true
+  
 
 }
 

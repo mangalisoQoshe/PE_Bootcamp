@@ -5,9 +5,17 @@ autoinstall:
   timezone: Africa/Johannesburg
   keyboard:
     layout: us
+
+  network:
+    version: 2
+    ethernets:
+      main-interface:
+        match:
+          name: "en*"
+        dhcp4: true
   
   identity:      
-    hostname: eye-of-earth
+    hostname: prod
     username: admin
     password: "$6$dw0E0OV94zNVkLrh$2.cosuB6dkbWSitROt0PT2oWFl/jWma87wepXxE2i7U1/C85Hp4QHa/3eQm5A5437vIMr5udTBU1yG4iL6vPY."
   
@@ -19,9 +27,10 @@ autoinstall:
   
   packages:
     - qemu-guest-agent
-  
-        
+     
   late-commands:
+    - curtin in-target --target=/target systemctl enable qemu-guest-agent
+    - curtin in-target --target=/target systemctl start qemu-guest-agent
     - echo 'admin ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/admin
     - chmod 440 /target/etc/sudoers.d/admin
 

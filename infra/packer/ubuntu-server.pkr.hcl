@@ -19,7 +19,7 @@ source "qemu" "ubuntu" {
   # VM configuration
   vm_name   = "${var.vm_name}.qcow2"
   disk_size = "${var.vm_disk_size}"
-  memory    = 4048 # changed from 2G to 4G
+  memory    = 4048
   cpus      = 2
 
   # Display and acceleration
@@ -30,6 +30,7 @@ source "qemu" "ubuntu" {
   # Network
   net_device     = "virtio-net"
   disk_interface = "virtio"
+
 
   # Output
   output_directory = "output_${var.vm_name}"
@@ -49,10 +50,10 @@ source "qemu" "ubuntu" {
 
   # Boot configuration
   efi_boot          = true
-efi_firmware_code = "/usr/share/OVMF/OVMF_CODE_4M.fd"
-efi_firmware_vars = "/usr/share/OVMF/OVMF_VARS_4M.fd"
-machine_type      = "q35"  # required for EFI
-  boot_wait = "10s"
+  efi_firmware_code = "/usr/share/OVMF/OVMF_CODE_4M.fd"
+  efi_firmware_vars = "/usr/share/OVMF/OVMF_VARS_4M.fd"
+  machine_type      = "q35" # required for EFI
+  boot_wait         = "10s"
   boot_command = [
     "c<wait>",
     "linux /casper/vmlinuz --- autoinstall ipv6.disable=1 ds='nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/'",
