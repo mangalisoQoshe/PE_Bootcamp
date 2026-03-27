@@ -1,0 +1,58 @@
+- name: Ensure keyrings directory exists
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+    group: admin
+
+- name: Get architecture
+  ansible.builtin.command:
+    cmd: dpkg --print-architecture
+  register: arch
+
+- name: Get OS codename
+  ansible.builtin.shell:
+    cmd: . /etc/os-release && echo "$VERSION_CODENAME"
+  register: codename
+
+- name: Download Docker GPG key
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+
+- name: Add Docker APT repository file for Ubuntu
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/docker.list
+    content: |
+      deb [arch={{ arch.stdout }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ codename.stdout }} stable
+
+
+- name: Update cache
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install docker and its dependencies for Ubuntu
+  ansible.builtin.apt:
+    name: 
+      - docker-ce 
+      - docker-ce-cli 
+      - containerd.io
+      - docker-buildx-plugin 
+
+- name: Ensure Docker plugin directory exists
+  ansible.builtin.file:
+    path: /usr/libexec/docker/cli-plugins
+    state: directory
+    mode: '0755'
+
+- name: Download Docker Compose for Ubuntu
+  ansible.builtin.get_url:
+    url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-darwin-x86_64
+    dest: /usr/libexec/docker/cli-plugins/docker-compose
+    mode: '0711'
+
+- name: Ensure group "docker" exists 
+  ansible.builtin.group:
+    name: docker
+    state: present

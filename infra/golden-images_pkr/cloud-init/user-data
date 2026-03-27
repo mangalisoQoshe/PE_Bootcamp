@@ -1,0 +1,18 @@
+#cloud-config
+
+hostname: prod
+timezone: Africa/Johannesburg
+
+locale: en_ZA.UTF-8
+
+users:
+  - name: admin
+    primary-group: admin
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: false
+    passwd: "$6$dw0E0OV94zNVkLrh$2.cosuB6dkbWSitROt0PT2oWFl/jWma87wepXxE2i7U1/C85Hp4QHa/3eQm5A5437vIMr5udTBU1yG4iL6vPY."
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWNdoXOoMitASBzbG24xlP0AdqZQDv8AJJH/QDuWOnV admin@prod
+

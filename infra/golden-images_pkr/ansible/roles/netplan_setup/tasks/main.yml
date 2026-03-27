@@ -1,0 +1,22 @@
+- name: Remove cloud-init generated netplan config
+  ansible.builtin.file:
+    path: /etc/netplan/50-cloud-init.yaml
+    state: absent
+
+- name: Deploy static netplan config
+  ansible.builtin.copy:
+    src: 01-netcfg.yaml
+    dest: /etc/netplan/01-netcfg.yaml
+    owner: root
+    group: root
+    mode: "0600"
+      
+- name: Disable cloud-init network management
+  ansible.builtin.copy:
+    src: 99-disable-network-config.cfg
+    dest: /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
+    owner: root
+    group: root
+    mode: "0644"
+
+

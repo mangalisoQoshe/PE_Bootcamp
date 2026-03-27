@@ -1,0 +1,11 @@
+- name: Install required packages
+  ansible.builtin.apt:
+    pkg:
+      - qemu-guest-agent
+
+
+- name: Enable qemu guest agent
+  ansible.builtin.service:
+    name: qemu-guest-agent
+    enabled: true
+

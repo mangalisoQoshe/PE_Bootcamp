@@ -43,7 +43,7 @@ check_binaries() {
 }
 
 check_env() {
-    echo "🔎 Checking Environment Variables..."
+    echo "Checking Environment Variables..."
     local missing_vars=0
     for var in POSTGRES_PWD POSTGRES_USER POSTGRES_DB; do
         if [ -z "${!var}" ]; then
@@ -59,12 +59,12 @@ check_env() {
 }
 
 build() {
-    echo "🔨 Building Docker image: "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION"..."
+    echo "Building Docker image: "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION"..."
     docker build -f "$DOCKERFILE" -t "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION" ./app || err "Docker build failed!"
 }
 
 push_dockerhub() {
-    echo "🔨 Preparing to push "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION" to Dockerhub registry."
+    echo "Push "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION" to Dockerhub registry."
     docker push "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION"
 }
 
@@ -80,14 +80,14 @@ check_files
 case "$1" in
     "up")
         build
-        echo "🚀 Starting the containers..."
+        echo "Starting the containers..."
         # We use "${@:1}" to pass all arguments (like -d) to docker compose
         check_env
         docker compose -f "$COMPOSE_FILE" up "${@:2}"
         ;;
 
     "down")
-        echo "🗑️ Destroying the containers..."
+        echo "Destroying the containers..."
         # Using -v ensures volumes are cleaned up to avoid "ghost data"
         docker compose -f "$COMPOSE_FILE" down -v
         ;;

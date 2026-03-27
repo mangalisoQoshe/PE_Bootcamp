@@ -208,7 +208,8 @@ marimo/_lsp/
 __marimo__/
 
 # Terraform & Packer
-.terraform*
+.terraform/*
 terraform.tfstate*
 infra/packer/output_ubuntu_24.04.4-server/*
 
+efivars.fd
