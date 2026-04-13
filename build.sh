@@ -59,6 +59,10 @@ check_env() {
 }
 
 build() {
+    # 1. Initial Checks
+    check_binaries
+    check_files
+    
     echo "Building Docker image: "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION"..."
     docker build -f "$DOCKERFILE" -t "$REPOSITORY_NAME/$IMAGE_NAME:$VERSION" ./app || err "Docker build failed!"
 }
@@ -70,12 +74,6 @@ push_dockerhub() {
 
 # --- Execution ---
 
-# 1. Initial Checks
-check_binaries
-check_files
-
-
-# 2. Argument Handling
 # We use a case statement here because it's cleaner than nested IFs
 case "$1" in
     "up")
